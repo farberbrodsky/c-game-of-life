@@ -24,7 +24,7 @@ void step() {
 
   for (int i = 0; i < GAME_WIDTH; i++) {
     for (int j = 0; j < GAME_HEIGHT; j++) {
-      int neighbors = G(i - 1, j) + G(i - 1, j - 1) + G(i, j - 1) + G(i + 1, j - 1) + G(i + 1, j) + G(i + 1, j + 1) + G(i + 1, j) + G(i + 1, j - 1);
+      int neighbors = G(i - 1, j) + G(i - 1, j - 1) + G(i, j - 1) + G(i + 1, j - 1) + G(i + 1, j) + G(i + 1, j + 1) + G(i, j + 1) + G(i - 1, j + 1);
 
       if (GAME[i][j]) {
         GAME[i][j] = (neighbors == 2) || (neighbors == 3);
@@ -40,7 +40,7 @@ void step() {
 unsigned int step_wrapper(unsigned int x, void* y) {
   if (!paused) step();
   void *z;
-  SDL_AddTimer(1000, step_wrapper, z);
+  SDL_AddTimer(500, step_wrapper, z);
   return 0;
 }
 
@@ -59,7 +59,7 @@ int main() {
   i32 full_screen = 0;
   // start simulation
   void *z;
-  SDL_AddTimer(1000, step_wrapper, z);
+  SDL_AddTimer(500, step_wrapper, z);
   while (running) {
     int win_width, win_height;
     SDL_GetWindowSize(window, &win_width, &win_height);
