@@ -14,9 +14,37 @@ typedef uint32_t u32;
 #define max(a,b) ((a) > (b) ? (a) : (b))
 #define min(a,b) ((a) < (b) ? (a) : (b))
 
-int main()
-{
-  bool GAME[GAME_WIDTH][GAME_HEIGHT];
+bool GAME[GAME_WIDTH][GAME_HEIGHT];
+bool paused = false;
+
+void step() {
+  bool game_copy[GAME_WIDTH][GAME_HEIGHT];
+  memcpy(game_copy, GAME, sizeof(bool) * GAME_WIDTH * GAME_HEIGHT);
+  #define G(i, j) game_copy[(i + GAME_WIDTH) % GAME_WIDTH][(j + GAME_HEIGHT) % GAME_HEIGHT]
+
+  for (int i = 0; i < GAME_WIDTH; i++) {
+    for (int j = 0; j < GAME_HEIGHT; j++) {
+      int neighbors = G(i - 1, j) + G(i - 1, j - 1) + G(i, j - 1) + G(i + 1, j - 1) + G(i + 1, j) + G(i + 1, j + 1) + G(i + 1, j) + G(i + 1, j - 1);
+
+      if (GAME[i][j]) {
+        GAME[i][j] = (neighbors == 2) || (neighbors == 3);
+      } else {
+        GAME[i][j] = (neighbors == 3);
+      }
+    }
+  }
+  #undef G
+}
+
+// step with a timer
+unsigned int step_wrapper(unsigned int x, void* y) {
+  if (!paused) step();
+  void *z;
+  SDL_AddTimer(1000, step_wrapper, z);
+  return 0;
+}
+
+int main() {
   for (int i = 0; i < GAME_WIDTH; i++) {
     for (int j = 0; j < GAME_HEIGHT; j++) {
       GAME[i][j] = false;
@@ -29,6 +57,9 @@ int main()
   
   i32 running = 1;
   i32 full_screen = 0;
+  // start simulation
+  void *z;
+  SDL_AddTimer(1000, step_wrapper, z);
   while (running) {
     int win_width, win_height;
     SDL_GetWindowSize(window, &win_width, &win_height);
@@ -50,6 +81,8 @@ int main()
               SDL_SetWindowFullscreen(window, WINDOW_FLAGS);
             }
             break;
+          case SDLK_SPACE:
+            paused = !paused;
           default:
             break;
         }
@@ -69,7 +102,7 @@ int main()
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(renderer, paused ? 0 : 255, paused ? 0 : 255, 255, 255);
 
     SDL_Rect rectangle;
     for (int i = 0; i < GAME_WIDTH; i++) {
