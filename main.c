@@ -9,8 +9,8 @@
 typedef int32_t i32;
 typedef uint32_t u32;
 
-#define GAME_WIDTH 32
-#define GAME_HEIGHT 18
+#define GAME_WIDTH 64
+#define GAME_HEIGHT 36
 #define max(a,b) ((a) > (b) ? (a) : (b))
 #define min(a,b) ((a) < (b) ? (a) : (b))
 
@@ -95,8 +95,10 @@ int main() {
     int mouse_state = SDL_GetMouseState(&mouse_x, &mouse_y);
     mouse_x = mouse_x / cell_size;
     mouse_y = mouse_y / cell_size;
-    if (mouse_state & SDL_MOUSEBUTTONDOWN && mouse_x < GAME_WIDTH && mouse_y < GAME_HEIGHT) {
-      GAME[mouse_x][mouse_y] = true;
+    bool left = mouse_state & SDL_BUTTON(SDL_BUTTON_LEFT);
+    bool right = mouse_state & SDL_BUTTON(SDL_BUTTON_RIGHT);
+    if ((left || right) && mouse_x < GAME_WIDTH && mouse_y < GAME_HEIGHT) {
+      GAME[mouse_x][mouse_y] = left;
     }
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
